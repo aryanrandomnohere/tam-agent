@@ -131,12 +131,15 @@ def get_usage_metrics(ctx, account_id: str) -> dict:
     }
 
 
-def search_kb(ctx, query: str = "", error_code: str = "", module: str = "") -> list[dict]:
+def search_kb(ctx, query: str = "", error_code: str = "", module: str = "", kb_type: str = "") -> list[dict]:
     """Searches knowledge-base articles by error code, module, and keywords.
     Automatically follows deprecated articles to their current superseded target.
     """
     kb = ctx.kb  # List of {"id", "meta", "body"}
     kb_by_id = {a["id"]: a for a in kb}
+    # Optional metadata filter, e.g. kb_type="limit" for by-design behaviour
+    if kb_type:
+        kb = [a for a in kb if a["meta"].get("type") == kb_type.strip()]
     matched_articles = []
     seen_ids = set()
 

@@ -64,16 +64,17 @@ ROUTING DESTINATIONS:
 You have access to 5 tools:
 1. `lookup_account(account_id, domain)`: Resolves account details, tier, contract renewal, open escalations.
 2. `get_usage_metrics(account_id)`: 12-month user and document trends, detects >25% user declines.
-3. `search_kb(query, error_code, module)`: Searches KB for troubleshooting, known incidents, and policies.
+3. `search_kb(query, error_code, module, kb_type)`: Searches KB for troubleshooting, known incidents, and policies. Optional kb_type filter: troubleshooting, how_to, limit, known_issue, policy, faq, reference.
 4. `check_related_tickets(account_id, module, error_code)`: Finds recent tickets to detect duplicates (within 7 days) and recurring issues.
 5. `get_kb_article(article_id)`: Reads the full text of one KB article (handling steps, workarounds) and lists its related articles.
 
 HOW TO WORK:
 - Call one tool at a time and read its result before choosing the next one. Only call tools you actually need.
 - Always call search_kb at least once before the final decision (error codes may appear only in the description).
+- For any problem report (not a pure how-to question), call check_related_tickets before deciding, especially for follow-ups ("Re:", "still").
 - Use get_kb_article to read the full handling steps of the most relevant article, and to follow its related articles when they matter (e.g. a known incident or a linked fix procedure).
 - If a search result has status "active_incident", read it with get_kb_article and follow its "Support handling" section.
-- If the results do not explain the symptom (e.g. a button is disabled), search again with other words such as "limit" or "by design".
+- If the results do not explain the symptom (e.g. a button is disabled), search again with kb_type="limit" to check for a documented by-design limit.
 - Compare the account facts with what the article says causes the error (e.g. a recent SSO change).
 - kb_references: only the articles that actually support your decision (usually 1-3), plus the policy article you applied.
 - customer_reply: only give steps that are written in a KB article you read. Never invent menu paths.
@@ -132,7 +133,7 @@ def _execute_tool(ctx, action: str, tool_input: dict, current_ticket: dict) -> t
         q = tool_input.get("query") or ""
         err = tool_input.get("error_code") or ""
         mod = tool_input.get("module") or ""
-        res = search_kb(ctx, query=q, error_code=err, module=mod)
+        res = search_kb(ctx, query=q, error_code=err, module=mod, kb_type=tool_input.get("kb_type") or "")
         if res:
             top_titles = [f"{a['id']} ({a['title']})" for a in res]
             obs = f"Found {len(res)} KB articles: {'; '.join(top_titles)}"
@@ -330,6 +331,10 @@ def triage(ticket: dict, ctx: Context) -> dict:
         "confidence": float(final_decision.get("confidence", 0.9)),
         "reasoning_trace": trace,
     }
+
+    # Hard policy rules from KB-2914 are enforced in code, not left to the LLM
+    if result["priority"] == "P1" or result["category"] == "security":
+        result["escalate"] = True
 
     # Validate schema integrity
     errs = validate(result)

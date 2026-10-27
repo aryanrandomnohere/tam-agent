@@ -1,0 +1,45 @@
+{
+  "ticket_id": "TKT-119877",
+  "account_id": "ACC-2431",
+  "category": "how_to",
+  "priority": "P3",
+  "route_to": "L1_support",
+  "escalate": true,
+  "notify_tam": true,
+  "duplicate_of": null,
+  "needs_clarification": false,
+  "kb_references": [
+    "KB-2914"
+  ],
+  "account_signals": [
+    "Renewal in 61 days (upcoming - high churn risk)",
+    "2 open executive escalation(s)",
+    "Premium tier account (1M+)",
+    "3-month trend: active users -33.6%, documents -48.6%",
+    "Account risk override trigger: active users declined 33.6% (>25% per KB-2914)",
+    "Active users declined by 33.6% over the last 3 months (>25% threshold)"
+  ],
+  "customer_reply": "Hello, thank you for reaching out to Zycus Support. We have received your inquiry regarding PO approval notification times. While you noted this is not urgent, due to your account status we have escalated your ticket to ensure our support team reviews your approval workflow settings promptly. An L1 Support specialist will follow up with you shortly.",
+  "internal_note": "Triage Assessment: Customer is asking a how-to/configuration question regarding PO approval processing speed. Initial customer priority is P4. However, applying KB-2914 Account Risk Override rules: Account renewal is in 61 days (< 90 days), open escalations = 2 (>= 2), and active users declined by 33.6% over the last 3 months (> 25%). Therefore, priority is raised by 1 level from P4 to P3, and both escalate and notify_tam are set to True. Routed to L1_support for workflow setting review.",
+  "confidence": 0.98,
+  "reasoning_trace": [
+    {
+      "step": 1,
+      "action": "lookup_account",
+      "input": "lookup_account(account_id=ACC-2431, domain=pinecrest-logistics.example) | Thought: Lookup account details for ACC-2431 to verify contract renewal status and open escalations, as well as check account risk override rules.",
+      "observation": "Resolved ACC-2431 (Pinecrest Logistics), Tier: Premium, Renewal: 61d, Open Esc: 2"
+    },
+    {
+      "step": 2,
+      "action": "get_usage_metrics",
+      "input": "get_usage_metrics(account_id=ACC-2431) | Thought: Check usage metrics for ACC-2431 to see if active users declined by >25% over the last 3 months, which combined with the renewal date (61 days < 90 days) and open escalations (2 >= 2) would trigger the Account Risk Override rule.",
+      "observation": "Usage latest month (2026-10): 700 users, 10198 docs. Signals: 3-month trend: active users -33.6%, documents -48.6%, Account risk override trigger: active users declined 33.6% (>25% per KB-2914)"
+    },
+    {
+      "step": 3,
+      "action": "decide_and_draft",
+      "input": "Synthesize evidence from 2 lookup steps",
+      "observation": "Categorized as how_to, Priority P3, Route L1_support"
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "ticket_id": "TKT-160094",
+  "account_id": "ACC-2507",
+  "category": "incident",
+  "priority": "P2",
+  "route_to": "L2_engineering",
+  "escalate": false,
+  "notify_tam": false,
+  "duplicate_of": null,
+  "needs_clarification": false,
+  "kb_references": [
+    "KB-1461",
+    "KB-4795",
+    "KB-7072"
+  ],
+  "account_signals": [
+    "Renewal in 150 days",
+    "Enterprise tier account (250k-500k)"
+  ],
+  "customer_reply": "Hello, thank you for contacting Zycus Support. We have received your report regarding error E-3310 preventing suppliers from submitting bids on your packaging RFx event, which closes in 2 days. Because this is a major function impaired affecting a business deadline within 72 hours, we have prioritized this as a P2 incident and routed it to our L2 Engineering team for investigation referencing KB-4795. We will provide an update as soon as more information is available.",
+  "internal_note": "Account ACC-2507 reports multiple suppliers encountering error E-3310 when submitting bids on a packaging RFx event closing in 2 days. According to KB-4795, E-3310 relates to bid submission rejection. Because a business deadline is at risk within 72 hours (event closes in 2 days) with no immediate workaround, this qualifies for Priority P2 per policy. Routed to L2_engineering.",
+  "confidence": 0.95,
+  "reasoning_trace": [
+    {
+      "step": 1,
+      "action": "lookup_account",
+      "input": "lookup_account(account_id=ACC-2507, domain=frostline-telecom.example) | Thought: I need to check account details for ACC-2507 to evaluate renewal status, contract terms, and whether Account Risk Override applies.",
+      "observation": "Resolved ACC-2507 (Frostline Telecom), Tier: Enterprise, Renewal: 150d, Open Esc: 0"
+    },
+    {
+      "step": 2,
+      "action": "check_related_tickets",
+      "input": "check_related_tickets(account_id=ACC-2507, module=Sourcing, error_code=E-3310) | Thought: I need to check if there are any duplicate tickets from the last 7 days regarding error code E-3310 in the Sourcing module for this account.",
+      "observation": "No duplicate candidate found. Recent tickets: 3"
+    },
+    {
+      "step": 3,
+      "action": "search_kb",
+      "input": "search_kb(error_code=E-3310, module=Sourcing, query=supplier bid submission error E-3310) | Thought: I will search the Knowledge Base to understand error code E-3310 in the Sourcing module.",
+      "observation": "Found 3 KB articles: KB-4795 (E-3310: Bid submission is rejected); KB-7072 (E-5214: Supplier onboarding form returns a validation error); KB-1461 (Configuration reference: Bid submission timeout)"
+    },
+    {
+      "step": 4,
+      "action": "decide_and_draft",
+      "input": "Synthesize evidence from 3 lookup steps",
+      "observation": "Categorized as incident, Priority P2, Route L2_engineering"
+    }
+  ]
+}

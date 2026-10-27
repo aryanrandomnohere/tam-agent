@@ -1,0 +1,35 @@
+{
+  "ticket_id": "TKT-128253",
+  "account_id": "ACC-3737",
+  "category": "needs_info",
+  "priority": "P3",
+  "route_to": "L1_support",
+  "escalate": false,
+  "notify_tam": false,
+  "duplicate_of": null,
+  "needs_clarification": true,
+  "kb_references": [
+    "KB-2914"
+  ],
+  "account_signals": [
+    "Renewal in 300 days",
+    "Standard tier account (100k-250k)"
+  ],
+  "customer_reply": "Hello Clearwater Manufacturing Support Team, \n\nThank you for reaching out to Zycus Support. We received your report that nothing is working, but we need a bit more information to assist you effectively. Could you please specify which module (e.g., Contracts, Sourcing, Platform) you are accessing and provide any specific error messages, screenshots, or steps to reproduce the issue? \n\nOnce we have this information, our L1 Support team will investigate immediately.\n\nBest regards,\nZycus Support",
+  "internal_note": "Ticket received with blank module and blank error code ('NOTHING WORKS'). Per KB-2914 (Insufficient Info policy), when module or symptom is missing and cannot be determined, set category to needs_info, priority to P3, route to L1_support, and set needs_clarification to True.",
+  "confidence": 1.0,
+  "reasoning_trace": [
+    {
+      "step": 1,
+      "action": "lookup_account",
+      "input": "lookup_account(account_id=ACC-3737, domain=clearwater-manufacturing.example) | Thought: The incoming ticket has a blank module and blank error code, but the account ID is provided (ACC-3737). According to Core Support Policy 7 (Insufficient Info), if the module or symptom is missing, we must not guess, but let's first check account details and active escalations or renewal status to see if there is any account risk or existing context.",
+      "observation": "Resolved ACC-3737 (Clearwater Manufacturing), Tier: Standard, Renewal: 300d, Open Esc: 0"
+    },
+    {
+      "step": 2,
+      "action": "decide_and_draft",
+      "input": "Synthesize evidence from 1 lookup steps",
+      "observation": "Categorized as needs_info, Priority P3, Route L1_support"
+    }
+  ]
+}

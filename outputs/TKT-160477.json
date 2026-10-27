@@ -1,0 +1,47 @@
+{
+  "ticket_id": "TKT-160477",
+  "account_id": "ACC-1633",
+  "category": "incident",
+  "priority": "P3",
+  "route_to": "L2_engineering",
+  "escalate": false,
+  "notify_tam": false,
+  "duplicate_of": null,
+  "needs_clarification": false,
+  "kb_references": [
+    "KB-1786"
+  ],
+  "account_signals": [
+    "Renewal in 240 days",
+    "Standard tier account (100k-250k)"
+  ],
+  "customer_reply": "Hello, thank you for reaching out to Zycus Support. We have reviewed your ticket regarding error E-2207 when sending supplier agreements for signature. According to our knowledge base (KB-1786), this error typically occurs due to an expired integration credential with the e-signature provider. We are routing this to our L2 Engineering team to verify and update your integration credentials so your contracts can be processed.",
+  "internal_note": "Ticket TKT-160477 for Frostline Retail Group (ACC-1633) reports error E-2207 in CLM affecting e-signature requests. Checked KB-1786 (expired integration credential). No duplicate tickets found within 7 days. Account renewal is in 240 days with 0 open escalations (no risk override needed). Routing to L2_engineering.",
+  "confidence": 0.95,
+  "reasoning_trace": [
+    {
+      "step": 1,
+      "action": "lookup_account",
+      "input": "lookup_account(account_id=ACC-1633, domain=frostline-retail-group.example) | Thought: Checking account details for ACC-1633 to determine contract renewal date and open escalations, which is necessary for applying Account Risk Override rules.",
+      "observation": "Resolved ACC-1633 (Frostline Retail Group), Tier: Standard, Renewal: 240d, Open Esc: 0"
+    },
+    {
+      "step": 2,
+      "action": "search_kb",
+      "input": "search_kb(error_code=E-2207, module=CLM) | Thought: Searching Knowledge Base for error code E-2207 in the CLM module to understand the root cause and determine appropriate triage and resolution steps.",
+      "observation": "Found 1 KB articles: KB-1786 (E-2207: E-signature request is rejected)"
+    },
+    {
+      "step": 3,
+      "action": "check_related_tickets",
+      "input": "check_related_tickets(account_id=ACC-1633, error_code=E-2207, module=CLM) | Thought: Checking if there are any recent related tickets for this account with the same error code to ensure this is not a duplicate ticket within the 7-day window.",
+      "observation": "No duplicate candidate found. Recent tickets: 3"
+    },
+    {
+      "step": 4,
+      "action": "decide_and_draft",
+      "input": "Synthesize evidence from 3 lookup steps",
+      "observation": "Categorized as incident, Priority P3, Route L2_engineering"
+    }
+  ]
+}

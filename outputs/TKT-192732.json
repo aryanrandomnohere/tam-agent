@@ -1,0 +1,42 @@
+{
+  "ticket_id": "TKT-192732",
+  "account_id": "ACC-6031",
+  "category": "duplicate",
+  "priority": "P3",
+  "route_to": "L1_support",
+  "escalate": false,
+  "notify_tam": false,
+  "duplicate_of": "TKT-122022",
+  "needs_clarification": false,
+  "kb_references": [
+    "KB-5930"
+  ],
+  "account_signals": [
+    "Renewal in 46 days (upcoming - high churn risk)",
+    "Enterprise tier account (250k-500k)",
+    "Potential duplicate of TKT-122022 (opened 3 days ago, status: open)"
+  ],
+  "customer_reply": "Hello, thank you for following up. We have linked this message to your existing open ticket TKT-122022 regarding error E-6105 on the spend dashboard. Our engineering and support team are actively investigating the issue on that ticket, and you will receive further updates there. We are closing this duplicate ticket to keep all correspondence consolidated.",
+  "internal_note": "Ticket TKT-192732 is identified as a duplicate of open ticket TKT-122022 created 3 days ago for error E-6105 in the analytics module, per KB-5930. Linked to existing investigation.",
+  "confidence": 0.99,
+  "reasoning_trace": [
+    {
+      "step": 1,
+      "action": "lookup_account",
+      "input": "lookup_account(account_id=ACC-6031, domain=riverbend-health.example) | Thought: Check account details to evaluate renewal date, tier, open escalations, and determine account risk override eligibility.",
+      "observation": "Resolved ACC-6031 (Riverbend Health), Tier: Enterprise, Renewal: 46d, Open Esc: 0"
+    },
+    {
+      "step": 2,
+      "action": "check_related_tickets",
+      "input": "check_related_tickets(account_id=ACC-6031, module=analytics, error_code=E-6105) | Thought: Check for duplicate or related recent tickets within the last 7 days for the analytics module and error E-6105.",
+      "observation": "Found duplicate candidate: TKT-122022 (opened 3d ago, status: open)"
+    },
+    {
+      "step": 3,
+      "action": "decide_and_draft",
+      "input": "Synthesize evidence from 2 lookup steps",
+      "observation": "Categorized as duplicate, Priority P3, Route L1_support"
+    }
+  ]
+}

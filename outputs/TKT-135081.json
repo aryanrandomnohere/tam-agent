@@ -1,0 +1,37 @@
+{
+  "ticket_id": "TKT-135081",
+  "account_id": "ACC-7533",
+  "category": "security",
+  "priority": "P1",
+  "route_to": "security",
+  "escalate": true,
+  "notify_tam": true,
+  "duplicate_of": null,
+  "needs_clarification": false,
+  "kb_references": [
+    "KB-6401",
+    "KB-6841",
+    "KB-9771"
+  ],
+  "account_signals": [
+    "Supplier reported seeing competitor bid amounts during reverse auction",
+    "Potential cross-supplier data exposure"
+  ],
+  "customer_reply": "Hello, thank you for bringing this to our attention. Per our security policies, any report of data visibility across suppliers or tenants is treated with the utmost urgency and investigated immediately by our security team, regardless of customer priority. We have escalated this to our security operations team and will follow up shortly.",
+  "internal_note": "Supplier reported visibility of competing supplier's bid amounts during a reverse auction. Per KB-6401, any report of a user/supplier seeing competitor bids, prices, or another tenant's data must IMMEDIATELY be classified as category=security, priority=P1, route_to=security, and escalated.",
+  "confidence": 1.0,
+  "reasoning_trace": [
+    {
+      "step": 1,
+      "action": "search_kb",
+      "input": "search_kb(query=supplier see competing bids prices data exposure, module=Sourcing) | Thought: Checking KB for security guidelines regarding suppliers seeing competitor bids or pricing data during reverse auctions.",
+      "observation": "Found 3 KB articles: KB-6401 (Handling suspected data exposure between suppliers or tenants); KB-6841 (FAQ: Can we export supplier profile data on a schedule?); KB-9771 (FAQ: Can we export supplier profile data on a schedule?)"
+    },
+    {
+      "step": 2,
+      "action": "decide_and_draft",
+      "input": "Synthesize evidence from 1 lookup steps",
+      "observation": "Categorized as security, Priority P1, Route security"
+    }
+  ]
+}

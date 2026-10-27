@@ -52,6 +52,16 @@ def lookup_account(ctx, account_id: str = "", domain: str = "") -> dict:
     tier = account_row.get("tier", "Standard")
     signals.append(f"{tier} tier account ({account_row.get('arr_band', 'N/A')})")
 
+    # Recent SSO change matters: some errors (e.g. E-3310) are caused by SSO reconfiguration
+    sso_str = account_row.get("sso_enabled_date", "")
+    if sso_str:
+        try:
+            sso_days = (AS_OF_DATE - datetime.strptime(sso_str, "%Y-%m-%d")).days
+            if 0 <= sso_days <= 30:
+                signals.append(f"SSO enabled/reconfigured {sso_days} days ago ({sso_str})")
+        except ValueError:
+            pass
+
     return {
         "found": True,
         "account_id": account_row.get("account_id"),
@@ -63,6 +73,7 @@ def lookup_account(ctx, account_id: str = "", domain: str = "") -> dict:
         "modules_licensed": account_row.get("modules_licensed", "").split(";"),
         "open_escalations": open_esc,
         "nps_last": account_row.get("nps_last"),
+        "sso_enabled_date": sso_str or None,
         "account_signals": signals,
     }
 
@@ -82,9 +93,9 @@ def get_usage_metrics(ctx, account_id: str) -> dict:
     recent = account_usage.iloc[-1].to_dict()
     signals = []
 
-    # Calculate 3-month trend if enough history exists
-    if len(account_usage) >= 3:
-        past = account_usage.iloc[-3].to_dict()
+    # Calculate 3-month trend: compare latest month with the month 3 months earlier
+    if len(account_usage) >= 4:
+        past = account_usage.iloc[-4].to_dict()
         try:
             recent_users = float(recent.get("active_users", 0) or 0)
             past_users = float(past.get("active_users", 0) or 0)
@@ -194,8 +205,32 @@ def search_kb(ctx, query: str = "", error_code: str = "", module: str = "") -> l
                 "excerpt": body_preview,
             })
 
+    # Active incidents first (they change routing), then keep relevance order
+    resolved.sort(key=lambda a: a["status"] != "active_incident")
+
     # Return top 3 most relevant articles
     return resolved[:3]
+
+
+def get_kb_article(ctx, article_id: str) -> dict:
+    """Returns the full text of one KB article plus its related article ids.
+    Lets the agent read handling steps and follow links from one article to another.
+    """
+    kb_by_id = {a["id"]: a for a in ctx.kb}
+    art = kb_by_id.get(article_id.strip())
+    if not art:
+        return {"found": False, "error": f"No KB article {article_id}"}
+    meta = art["meta"]
+    return {
+        "found": True,
+        "id": art["id"],
+        "title": meta.get("title"),
+        "type": meta.get("type"),
+        "status": meta.get("status"),
+        "superseded_by": meta.get("superseded_by"),
+        "related": meta.get("related", []),
+        "body": art["body"].strip()[:3000],  # cap size to keep the prompt small
+    }
 
 
 def check_related_tickets(ctx, account_id: str, current_ticket_id: str = "", module: str = "", error_code: str = "") -> dict:
@@ -236,7 +271,8 @@ def check_related_tickets(ctx, account_id: str, current_ticket_id: str = "", mod
             # Check if matching error code or module
             same_err = error_code and t_err and (error_code.strip() == t_err.strip())
             same_mod = module and t_mod and (module.lower() in t_mod or t_mod in module.lower())
-            if same_err or same_mod or not duplicate_candidate:
+            # Only flag when the error code or module matches (KB-5930)
+            if same_err or same_mod:
                 duplicate_candidate = {
                     "ticket_id": t.get("ticket_id"),
                     "subject": t.get("subject"),

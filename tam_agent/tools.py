@@ -1,6 +1,7 @@
 """Agent tools for TAM support ticket triage.
 Each tool is a pure function that looks up data from context (ctx).
 """
+import math
 from datetime import datetime
 
 AS_OF_DATE = datetime.strptime("2026-10-20", "%Y-%m-%d")
@@ -154,6 +155,14 @@ def search_kb(ctx, query: str = "", error_code: str = "", module: str = "") -> l
     if query:
         terms = [t.lower() for t in query.split() if len(t) > 2]
         stems = [t[:5] if len(t) >= 5 else t for t in terms]
+
+        # IDF weight: rare words ("bulk") count more than common ones ("purchase")
+        n = len(kb)
+        weights = []
+        for s in stems:
+            df = sum(1 for art in kb if s in art["meta"].get("title", "").lower() or s in art["body"].lower())
+            weights.append(math.log((n + 1) / (df + 1)))
+
         for art in kb:
             if art["id"] in seen_ids:
                 continue
@@ -164,13 +173,18 @@ def search_kb(ctx, query: str = "", error_code: str = "", module: str = "") -> l
 
             # Score relevance
             score = 0
-            for term, s in zip(terms, stems):
+            for term, s, w in zip(terms, stems, weights):
                 if term in title_lower or s in title_lower:
-                    score += 5
+                    score += 5 * w
                 if term in mod_lower:
-                    score += 2
+                    score += 2 * w
                 if term in body_lower or s in body_lower:
-                    score += 1
+                    score += 1 * w
+
+            # Boost articles from the ticket's module (module text is free-form, so match loosely)
+            mod_q = module.lower().strip()
+            if score > 0 and mod_q and mod_q != "all" and (mod_q in mod_lower or (mod_lower and mod_lower in mod_q)):
+                score += 3
 
             if score > 0:
                 matched_articles.append((score, art))
@@ -205,11 +219,8 @@ def search_kb(ctx, query: str = "", error_code: str = "", module: str = "") -> l
                 "excerpt": body_preview,
             })
 
-    # Active incidents first (they change routing), then keep relevance order
-    resolved.sort(key=lambda a: a["status"] != "active_incident")
-
-    # Return top 3 most relevant articles
-    return resolved[:3]
+    # Return top 5 most relevant articles (short excerpts keep the prompt small)
+    return resolved[:5]
 
 
 def get_kb_article(ctx, article_id: str) -> dict:
@@ -280,6 +291,7 @@ def check_related_tickets(ctx, account_id: str, current_ticket_id: str = "", mod
                     "created_at": t_created,
                     "days_ago": days_ago,
                     "error_code": t_err,
+                    "customer_priority": t.get("customer_priority") or None,
                 }
                 signals.append(f"Potential duplicate of {t.get('ticket_id')} (opened {days_ago} days ago, status: {t_status})")
                 break

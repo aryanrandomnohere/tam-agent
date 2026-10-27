@@ -9,26 +9,32 @@
   "duplicate_of": null,
   "needs_clarification": true,
   "kb_references": [
-    "KB-2914"
+    "KB-1033"
   ],
   "account_signals": [
     "Renewal in 300 days",
     "Standard tier account (100k-250k)"
   ],
-  "customer_reply": "Hello Clearwater Manufacturing Support Team, \n\nThank you for reaching out to Zycus Support. We received your report that nothing is working, but we need a bit more information to assist you effectively. Could you please specify which module (e.g., Contracts, Sourcing, Platform) you are accessing and provide any specific error messages, screenshots, or steps to reproduce the issue? \n\nOnce we have this information, our L1 Support team will investigate immediately.\n\nBest regards,\nZycus Support",
-  "internal_note": "Ticket received with blank module and blank error code ('NOTHING WORKS'). Per KB-2914 (Insufficient Info policy), when module or symptom is missing and cannot be determined, set category to needs_info, priority to P3, route to L1_support, and set needs_clarification to True.",
-  "confidence": 1.0,
+  "customer_reply": "Hello, thank you for contacting Zycus Support. We received your request, but unfortunately, the module and specific details or error messages were not provided. To help us investigate and resolve this issue as quickly as possible, could you please let us know which module or feature you are trying to use, provide the exact error message or steps to reproduce the issue, and include any relevant screenshots?",
+  "internal_note": "Ticket TKT-128253 submitted with BLANK module and insufficient description ('Nothing is working since yesterday'). Per policy, tickets with missing module or symptom are classified as needs_info, priority P3, and routed to L1_support requiring clarification.",
+  "confidence": 0.99,
   "reasoning_trace": [
     {
       "step": 1,
       "action": "lookup_account",
-      "input": "lookup_account(account_id=ACC-3737, domain=clearwater-manufacturing.example) | Thought: The incoming ticket has a blank module and blank error code, but the account ID is provided (ACC-3737). According to Core Support Policy 7 (Insufficient Info), if the module or symptom is missing, we must not guess, but let's first check account details and active escalations or renewal status to see if there is any account risk or existing context.",
+      "input": "lookup_account(account_id=ACC-3737, domain=clearwater-manufacturing.example) | Thought: Resolving account details to verify account tier, renewal proximity, active escalations, and account risk signals.",
       "observation": "Resolved ACC-3737 (Clearwater Manufacturing), Tier: Standard, Renewal: 300d, Open Esc: 0"
     },
     {
       "step": 2,
+      "action": "search_kb",
+      "input": "search_kb(query=nothing works blank module, module=, error_code=) | Thought: Searching Knowledge Base for information related to vague or missing module tickets.",
+      "observation": "Found 5 KB articles: KB-1001 (Release notes 24.1); KB-1010 (How to: Process a credit memo); KB-1033 (How to: Reset a user password); KB-1189 (Release notes 25.1); KB-1204 (How to: Change a PO after approval)"
+    },
+    {
+      "step": 3,
       "action": "decide_and_draft",
-      "input": "Synthesize evidence from 1 lookup steps",
+      "input": "Synthesize evidence from 2 lookup steps",
       "observation": "Categorized as needs_info, Priority P3, Route L1_support"
     }
   ]

@@ -1,49 +1,54 @@
 {
   "ticket_id": "TKT-169327",
   "account_id": "ACC-4850",
-  "category": "bug",
+  "category": "incident",
   "priority": "P3",
-  "route_to": "L2_engineering",
+  "route_to": "L1_support",
   "escalate": false,
   "notify_tam": false,
   "duplicate_of": null,
   "needs_clarification": false,
   "kb_references": [
-    "KB-1212",
-    "KB-7072",
-    "KB-9755"
+    "KB-2914",
+    "KB-7072"
   ],
   "account_signals": [
     "Renewal in 320 days",
     "Enterprise tier account (250k-500k)"
   ],
-  "customer_reply": "Hello, thank you for reaching out to Zycus Support. We have received your report regarding error E-5214 on the supplier onboarding form for your EU entity. Our L2 Engineering team has been notified and is investigating the validation error. We will update you as soon as we have a resolution.",
-  "internal_note": "Ticket TKT-169327 for account ACC-4850 reports error E-5214 during supplier onboarding form submission. According to KB-7072, this is a validation error in the Supplier Management / Supplier Portal module. Routed to L2_engineering as a standard bug (P3 since it affects a single onboarding workflow and has a standard validation error profile). No duplicate tickets found in the past 7 days. Account renewal is 320 days away (not within 90 days), so renewal risk rules do not apply.",
+  "customer_reply": "Hello,\n\nThank you for reaching out to Zycus Support regarding the supplier onboarding form error (E-5214). \n\nThis error occurs when a background scheduler job is paused. Please follow these steps to resolve the issue:\n1. Open Admin > Scheduler and locate the paused job.\n2. Resume the job and run it once manually.\n3. Confirm downstream records update within 15 minutes.\n\nIf the issue persists or if more than 50 records are affected, please let us know so we can investigate further.\n\nBest regards,\nZycus Technical Support",
+  "internal_note": "Account ACC-4850 reported error E-5214 on the supplier portal onboarding form. Checked for duplicates (none found within 7 days). Renewal is 320 days away (no account risk override triggered). Root cause per KB-7072 is a paused background scheduler job. Assigned to L1 support with resolution steps provided.",
   "confidence": 0.98,
   "reasoning_trace": [
     {
       "step": 1,
       "action": "lookup_account",
-      "input": "lookup_account(account_id=, domain=ironleaf-foods-europe.example) | Thought: The incoming ticket has a blank Account ID but provides a requester domain. I need to look up the account details to identify the correct Account ID, tier, renewal date, and open escalations.",
+      "input": "lookup_account(account_id=, domain=ironleaf-foods-europe.example) | Thought: Account ID is blank in the ticket. I need to resolve the account ID using the customer's requester domain to check account health, renewal risk, and related tickets.",
       "observation": "Resolved ACC-4850 (Ironleaf Foods Europe), Tier: Enterprise, Renewal: 320d, Open Esc: 0"
     },
     {
       "step": 2,
       "action": "search_kb",
-      "input": "search_kb(error_code=E-5214, module=supplier portal, query=E-5214 onboarding form error) | Thought: I have the account ID (ACC-4850) and error code (E-5214) for the supplier portal module. Now I need to search the knowledge base to understand what error E-5214 means, how it impacts the system, and what the correct routing/resolution is.",
-      "observation": "Found 3 KB articles: KB-7072 (E-5214: Supplier onboarding form returns a validation error); KB-1212 (E-5104: Supplier onboarding form is rejected); KB-9755 (FAQ: Can a supplier onboarding form be restored after deletion?)"
+      "input": "search_kb(error_code=E-5214, module=supplier portal) | Thought: I need to search the knowledge base for error code E-5214 in the supplier portal module to find troubleshooting steps and known issues.",
+      "observation": "Found 1 KB articles: KB-7072 (E-5214: Supplier onboarding form returns a validation error)"
     },
     {
       "step": 3,
-      "action": "check_related_tickets",
-      "input": "check_related_tickets(account_id=ACC-4850, error_code=E-5214, module=supplier portal) | Thought: I have identified the account (ACC-4850) and the KB article for error E-5214 (KB-7072). Before finalizing, I should check if there are any related or duplicate open tickets for this account in the last 7 days regarding the supplier portal.",
-      "observation": "No duplicate candidate found. Recent tickets: 3"
+      "action": "get_kb_article",
+      "input": "get_kb_article(article_id=KB-7072) | Thought: I need to read the full content of KB-7072 to understand the cause and resolution for error E-5214.",
+      "observation": "Read KB-7072 (E-5214: Supplier onboarding form returns a validation error), status: current, related: ['KB-2914']"
     },
     {
       "step": 4,
+      "action": "check_related_tickets",
+      "input": "check_related_tickets(account_id=ACC-4850, error_code=E-5214, module=supplier portal) | Thought: I need to check for related tickets within the last 7 days for this account, module, and error code to determine if this is a duplicate.",
+      "observation": "No duplicate candidate found. Recent tickets: 3"
+    },
+    {
+      "step": 5,
       "action": "decide_and_draft",
-      "input": "Synthesize evidence from 3 lookup steps",
-      "observation": "Categorized as bug, Priority P3, Route L2_engineering"
+      "input": "Synthesize evidence from 4 lookup steps",
+      "observation": "Categorized as incident, Priority P3, Route L1_support"
     }
   ]
 }

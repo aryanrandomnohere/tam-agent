@@ -3,7 +3,7 @@
   "account_id": "ACC-1633",
   "category": "incident",
   "priority": "P3",
-  "route_to": "L2_engineering",
+  "route_to": "L1_support",
   "escalate": false,
   "notify_tam": false,
   "duplicate_of": null,
@@ -15,33 +15,39 @@
     "Renewal in 240 days",
     "Standard tier account (100k-250k)"
   ],
-  "customer_reply": "Hello, thank you for reaching out to Zycus Support. We have reviewed your ticket regarding error E-2207 when sending supplier agreements for signature. According to our knowledge base (KB-1786), this error typically occurs due to an expired integration credential with the e-signature provider. We are routing this to our L2 Engineering team to verify and update your integration credentials so your contracts can be processed.",
-  "internal_note": "Ticket TKT-160477 for Frostline Retail Group (ACC-1633) reports error E-2207 in CLM affecting e-signature requests. Checked KB-1786 (expired integration credential). No duplicate tickets found within 7 days. Account renewal is in 240 days with 0 open escalations (no risk override needed). Routing to L2_engineering.",
-  "confidence": 0.95,
+  "customer_reply": "Hello,\n\nThank you for reaching out to Zycus Support regarding error E-2207 when sending supplier agreements for e-signature.\n\nThis error typically occurs due to an expired integration credential. You can resolve this by following these steps:\n1. Open Admin > Integrations > Credentials.\n2. Regenerate the credential and update it in the connected system.\n3. Trigger a manual sync and confirm the job status shows Completed.\n\nPlease let us know if you continue to experience issues after performing these steps.\n\nBest regards,\nZycus Support",
+  "internal_note": "Ticket TKT-160477 reports error E-2207 affecting 2 contracts in CLM. Checked KB-1786, which identifies the cause as an expired integration credential. Provided standard tenant administrator resolution steps (Admin > Integrations > Credentials). No duplicates or account risk overrides apply.",
+  "confidence": 0.98,
   "reasoning_trace": [
     {
       "step": 1,
       "action": "lookup_account",
-      "input": "lookup_account(account_id=ACC-1633, domain=frostline-retail-group.example) | Thought: Checking account details for ACC-1633 to determine contract renewal date and open escalations, which is necessary for applying Account Risk Override rules.",
+      "input": "lookup_account(account_id=ACC-1633, domain=frostline-retail-group.example) | Thought: Check account details to assess contract renewal date, active users, and open escalations for risk override policies.",
       "observation": "Resolved ACC-1633 (Frostline Retail Group), Tier: Standard, Renewal: 240d, Open Esc: 0"
     },
     {
       "step": 2,
       "action": "search_kb",
-      "input": "search_kb(error_code=E-2207, module=CLM) | Thought: Searching Knowledge Base for error code E-2207 in the CLM module to understand the root cause and determine appropriate triage and resolution steps.",
-      "observation": "Found 1 KB articles: KB-1786 (E-2207: E-signature request is rejected)"
+      "input": "search_kb(error_code=E-2207, module=CLM, query=E-signature request rejected E-2207) | Thought: Search the Knowledge Base for error code E-2207 in the CLM module to understand the cause and troubleshooting steps.",
+      "observation": "Found 5 KB articles: KB-1786 (E-2207: E-signature request is rejected); KB-3526 (Contracts limit: e-signature request batch size); KB-3760 (E-2109: E-signature request creates duplicate records); KB-5320 (FAQ: Can a e-signature request be restored after deletion?); KB-6495 (Configuration reference: E-signature request routing)"
     },
     {
       "step": 3,
-      "action": "check_related_tickets",
-      "input": "check_related_tickets(account_id=ACC-1633, error_code=E-2207, module=CLM) | Thought: Checking if there are any recent related tickets for this account with the same error code to ensure this is not a duplicate ticket within the 7-day window.",
-      "observation": "No duplicate candidate found. Recent tickets: 3"
+      "action": "get_kb_article",
+      "input": "get_kb_article(article_id=KB-1786) | Thought: Read KB-1786 to get the complete troubleshooting steps and cause for error E-2207.",
+      "observation": "Read KB-1786 (E-2207: E-signature request is rejected), status: current, related: ['KB-2914']"
     },
     {
       "step": 4,
+      "action": "check_related_tickets",
+      "input": "check_related_tickets(account_id=ACC-1633, error_code=E-2207, module=CLM) | Thought: Check for recent duplicate tickets within the last 7 days for account ACC-1633 in CLM with error E-2207.",
+      "observation": "No duplicate candidate found. Recent tickets: 3"
+    },
+    {
+      "step": 5,
       "action": "decide_and_draft",
-      "input": "Synthesize evidence from 3 lookup steps",
-      "observation": "Categorized as incident, Priority P3, Route L2_engineering"
+      "input": "Synthesize evidence from 4 lookup steps",
+      "observation": "Categorized as incident, Priority P3, Route L1_support"
     }
   ]
 }

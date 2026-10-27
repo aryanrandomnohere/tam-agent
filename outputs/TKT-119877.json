@@ -9,36 +9,49 @@
   "duplicate_of": null,
   "needs_clarification": false,
   "kb_references": [
-    "KB-2914"
+    "KB-2914",
+    "KB-4449",
+    "KB-5638"
   ],
   "account_signals": [
     "Renewal in 61 days (upcoming - high churn risk)",
     "2 open executive escalation(s)",
     "Premium tier account (1M+)",
-    "3-month trend: active users -33.6%, documents -48.6%",
-    "Account risk override trigger: active users declined 33.6% (>25% per KB-2914)",
-    "Active users declined by 33.6% over the last 3 months (>25% threshold)"
+    "3-month trend: active users -49.1%, documents -43.3%",
+    "Account risk override trigger: active users declined 49.1% (>25% per KB-2914)"
   ],
-  "customer_reply": "Hello, thank you for reaching out to Zycus Support. We have received your inquiry regarding PO approval notification times. While you noted this is not urgent, due to your account status we have escalated your ticket to ensure our support team reviews your approval workflow settings promptly. An L1 Support specialist will follow up with you shortly.",
-  "internal_note": "Triage Assessment: Customer is asking a how-to/configuration question regarding PO approval processing speed. Initial customer priority is P4. However, applying KB-2914 Account Risk Override rules: Account renewal is in 61 days (< 90 days), open escalations = 2 (>= 2), and active users declined by 33.6% over the last 3 months (> 25%). Therefore, priority is raised by 1 level from P4 to P3, and both escalate and notify_tam are set to True. Routed to L1_support for workflow setting review.",
-  "confidence": 0.98,
+  "customer_reply": "Hello,\n\nThank you for reaching out regarding your eProcurement approval workflows. To check and adjust your approval workflow levels, tenant administrators can follow these steps (KB-5638):\n1. Navigate to Setup and Configuration > eProcurement Administration > Approval Workflows.\n2. Review the routing rules, threshold limits, and conditional approver lists to ensure they are optimized for your volume.\n3. If specific approvers are experiencing delays due to absence, you can also set up out-of-office delegations by opening your profile menu, selecting Out of Office, choosing a delegate with the same or higher approval limit, and setting the start and end dates (KB-4449).\n\nPlease let us know if you need any further assistance configuring these settings!\n\nBest regards,\nZycus Support",
+  "internal_note": "Ticket TKT-119877 from Pinecrest Logistics (ACC-2431) regarding slow purchase order approvals. Customer priority is P4 (how-to question). Account Risk Override applies: renewal in 61 days (<= 90 days) and active users declined by 49.1% over the last 3 months (>25%), plus 2 open escalations. Per KB-2914, priority is raised by 1 level from P4 to P3, set notify_tam = True, and set escalate = True. No duplicate tickets found. Routed to L1_support.",
+  "confidence": 0.95,
   "reasoning_trace": [
     {
       "step": 1,
       "action": "lookup_account",
-      "input": "lookup_account(account_id=ACC-2431, domain=pinecrest-logistics.example) | Thought: Lookup account details for ACC-2431 to verify contract renewal status and open escalations, as well as check account risk override rules.",
+      "input": "lookup_account(account_id=ACC-2431, domain=pinecrest-logistics.example) | Thought: Check account details to assess contract renewal date, active user trends, and escalation history.",
       "observation": "Resolved ACC-2431 (Pinecrest Logistics), Tier: Premium, Renewal: 61d, Open Esc: 2"
     },
     {
       "step": 2,
       "action": "get_usage_metrics",
-      "input": "get_usage_metrics(account_id=ACC-2431) | Thought: Check usage metrics for ACC-2431 to see if active users declined by >25% over the last 3 months, which combined with the renewal date (61 days < 90 days) and open escalations (2 >= 2) would trigger the Account Risk Override rule.",
-      "observation": "Usage latest month (2026-10): 700 users, 10198 docs. Signals: 3-month trend: active users -33.6%, documents -48.6%, Account risk override trigger: active users declined 33.6% (>25% per KB-2914)"
+      "input": "get_usage_metrics(account_id=ACC-2431) | Thought: Check usage metrics over the past 12 months to see if active users declined by >25% for the Account Risk Override policy.",
+      "observation": "Usage latest month (2026-10): 700 users, 10198 docs. Signals: 3-month trend: active users -49.1%, documents -43.3%, Account risk override trigger: active users declined 49.1% (>25% per KB-2914)"
     },
     {
       "step": 3,
+      "action": "search_kb",
+      "input": "search_kb(error_code=, kb_type=how_to, module=eProcurement, query=approvals slow purchase order inbox) | Thought: Search KB for how-to / configuration questions regarding slow purchase order approvals in eProcurement.",
+      "observation": "Found 5 KB articles: KB-2430 (How to: Bulk-approve purchase orders); KB-4449 (How to: Delegate approvals while out of office); KB-1204 (How to: Change a PO after approval); KB-5638 (How to: Configure approval workflow levels); KB-2023 (How to: Route invoices for exception approval)"
+    },
+    {
+      "step": 4,
+      "action": "check_related_tickets",
+      "input": "check_related_tickets(account_id=ACC-2431, error_code=, module=eProcurement) | Thought: Check related tickets to see if there are any duplicate tickets within the last 7 days.",
+      "observation": "No duplicate candidate found. Recent tickets: 3"
+    },
+    {
+      "step": 5,
       "action": "decide_and_draft",
-      "input": "Synthesize evidence from 2 lookup steps",
+      "input": "Synthesize evidence from 4 lookup steps",
       "observation": "Categorized as how_to, Priority P3, Route L1_support"
     }
   ]

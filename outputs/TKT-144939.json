@@ -10,41 +10,44 @@
   "needs_clarification": false,
   "kb_references": [
     "KB-2914",
-    "KB-3985",
-    "KB-7914",
-    "KB-9799"
+    "KB-3985"
   ],
   "account_signals": [
     "Renewal in 45 days (upcoming - high churn risk)",
-    "Premium tier account (1M+)",
-    "Production down / major module impacted (eInvoice OCR failing for all uploads)"
+    "Premium tier account (1M+)"
   ],
-  "customer_reply": "Hello, thank you for contacting Zycus Support. We have received your report regarding the eInvoice OCR failures with error E-4102. This is tied to an active engineering incident (INC-26-0418 affecting release 26.2.3). Because your account is approaching renewal and month-end processing is critical, we have escalated this directly to L2 Engineering and notified your Technical Account Manager. We will provide updates as soon as the hotfix is deployed.",
-  "internal_note": "Triage Assessment: eInvoice OCR jobs failing with error E-4102 for Brightfield Manufacturing (ACC-3751). Matches active known issue KB-3985 / incident INC-26-0418. Account is Premium tier with renewal in 45 days (< 90 days), triggering account risk / escalation override rules. Routed to L2_engineering with P1 priority.",
-  "confidence": 0.98,
+  "customer_reply": "Hello, thank you for reaching out to Zycus Support. We are aware of the issue affecting invoice OCR processing with error code E-4102 following release 26.2.3 (Incident reference: INC-26-0418). Our Engineering team is actively working on a hotfix.\n\nWorkaround:\n1. Switch affected invoice channels to Manual Entry mode (Admin > eInvoice > Channels).\n2. Hold month-end OCR batches until the hotfix is deployed, or process critical invoices manually.\n\nWe have escalated this ticket to our L2 Engineering team and notified your TAM. We will update you as soon as the hotfix is available.",
+  "internal_note": "Ticket TKT-144939 linked to active incident INC-26-0418 (KB-3985). Account is Premium tier with renewal in 45 days. Routed to L2_engineering as P1 with TAM notification and escalation due to active system incident blocking all OCR processing.",
+  "confidence": 0.99,
   "reasoning_trace": [
     {
       "step": 1,
       "action": "lookup_account",
-      "input": "lookup_account(account_id=ACC-3751, domain=brightfield-manufacturing.example) | Thought: Check account details, renewal date, and open escalations to evaluate account risk override and overall priority.",
+      "input": "lookup_account(account_id=ACC-3751, domain=brightfield-manufacturing.example) | Thought: Check account tier, renewal dates, and status to evaluate risk override rules.",
       "observation": "Resolved ACC-3751 (Brightfield Manufacturing), Tier: Premium, Renewal: 45d, Open Esc: 0"
     },
     {
       "step": 2,
-      "action": "check_related_tickets",
-      "input": "check_related_tickets(account_id=ACC-3751, module=eInvoice, error_code=E-4102) | Thought: Check for any recent duplicate tickets within the last 7 days regarding eInvoice error E-4102.",
-      "observation": "No duplicate candidate found. Recent tickets: 3"
+      "action": "search_kb",
+      "input": "search_kb(error_code=E-4102, module=eInvoice, query=E-4102 OCR) | Thought: Search the Knowledge Base for error code E-4102 to see if there is an active incident or known issue.",
+      "observation": "Found 5 KB articles: KB-3985 (KNOWN ISSUE: Invoice OCR jobs fail with E-4102 after release 26.2.3); KB-7914 (E-4102: Invoice ocr job stays stuck in processing); KB-3539 (E-4320: Invoice ocr job fails to save); KB-7428 (Configuration reference: Invoice ocr job visibility); KB-7767 (Configuration reference: Invoice ocr job language)"
     },
     {
       "step": 3,
-      "action": "search_kb",
-      "input": "search_kb(error_code=E-4102, module=eInvoice, query=OCR invoices failing error E-4102) | Thought: Search knowledge base for error E-4102 in eInvoice module to check handling procedure and known issues.",
-      "observation": "Found 3 KB articles: KB-3985 (KNOWN ISSUE: Invoice OCR jobs fail with E-4102 after release 26.2.3); KB-7914 (E-4102: Invoice ocr job stays stuck in processing); KB-9799 (E-4211: Invoice ocr job returns a validation error)"
+      "action": "get_kb_article",
+      "input": "get_kb_article(article_id=KB-3985) | Thought: Read the full KB article for the active incident KB-3985 to obtain support handling steps and related info.",
+      "observation": "Read KB-3985 (KNOWN ISSUE: Invoice OCR jobs fail with E-4102 after release 26.2.3), status: active_incident, related: ['KB-7914', 'KB-2914']"
     },
     {
       "step": 4,
+      "action": "check_related_tickets",
+      "input": "check_related_tickets(account_id=ACC-3751, error_code=E-4102, module=eInvoice) | Thought: Check for related recent tickets to confirm if this is a duplicate ticket.",
+      "observation": "No duplicate candidate found. Recent tickets: 3"
+    },
+    {
+      "step": 5,
       "action": "decide_and_draft",
-      "input": "Synthesize evidence from 3 lookup steps",
+      "input": "Synthesize evidence from 4 lookup steps",
       "observation": "Categorized as incident, Priority P1, Route L2_engineering"
     }
   ]
